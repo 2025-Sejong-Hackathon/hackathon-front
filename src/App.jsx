@@ -27,6 +27,7 @@ import ReceivePick from './pages/Matching/ReceivePick.jsx';
 
 import ChatRoom from './pages/Matching/ChatRoom.jsx';
 import Laundry from './pages/Laundry/Laundry.jsx';
+import GroupBuyChatRoom from './pages/GroupBuy/GroupBuyChatRoom.jsx';
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
             <Route path='/group-buy/create' element={<GroupBuyCreate />} />
             <Route path='/group-buy/chats' element={<GroupBuyChatList />} />
             <Route path='/group-buy/:id' element={<GroupBuyDetail />} />
+            <Route path='/group-buy/:id/chat' element={<GroupBuyChatRoom />} />
             <Route path='/mypage' element={<Mypage />} />
             <Route
               path='/mypage/roommate-evaluation'

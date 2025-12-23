@@ -1,35 +1,50 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const MOCK_PARTICIPATING_GROUP_BUYS = [
-  {
-    id: 1,
-    title: '호랑이비빕밥 같이 먹어요',
-    category: '한식',
-    currentParticipants: 1,
-    maxParticipants: 3,
-    author: '박승희',
-    lastMessage: '비비큐 황금올리브에 치즈볼도 추가할까요?',
-    lastMessageTime: '오후 2:30',
-    unreadCount: 2,
-  },
-  {
-    id: 2,
-    title: '아이깨끗해 공구',
-    category: '물품',
-    currentParticipants: 2,
-    maxParticipants: 5,
-    author: '정수진',
-    lastMessage: '언제 배송되나요?',
-    lastMessageTime: '오전 10:15',
-    unreadCount: 0,
-  },
-];
 
 export default function GroupBuyChatList() {
   const navigate = useNavigate();
+  const [groupBuys, setGroupBuys] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleChatClick = (id) => {
-    navigate(`/group-buy/${id}/chat`);
+  useEffect(() => {
+    const fetchJoinedGroupBuys = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/api/v1/groupbuys/joined`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // API 응답 데이터 매핑
+          const mappedData = data.data.map(item => ({
+            id: item.id,
+            title: item.title,
+            category: item.categoryName,
+            currentParticipants: item.currentCount,
+            maxParticipants: item.targetCount,
+            author: item.memberName,
+            lastMessage: '채팅방이 생성되었습니다.', // API 미지원으로 임시 텍스트
+            lastMessageTime: new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            unreadCount: 0,
+          }));
+          setGroupBuys(mappedData);
+        }
+      } catch (err) {
+        console.error('Failed to fetch joined group buys:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJoinedGroupBuys();
+  }, []);
+
+  const handleChatClick = (groupBuy) => {
+    // 공동구매 전용 채팅방으로 이동 (공구 제목을 같이 전달)
+    navigate(`/group-buy/${groupBuy.id}/chat`, { state: { title: groupBuy.title } });
   };
 
   return (
@@ -59,22 +74,24 @@ export default function GroupBuyChatList() {
 
       {/* Chat List */}
       <div className="flex flex-col px-6 pb-8 gap-3">
-        {MOCK_PARTICIPATING_GROUP_BUYS.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-10 text-gray-400">로딩 중...</div>
+        ) : groupBuys.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <p className="text-gray-400 text-lg mb-2">참여 중인 공구가 없습니다</p>
             <p className="text-gray-300 text-sm">공구에 참여해보세요!</p>
           </div>
         ) : (
-          MOCK_PARTICIPATING_GROUP_BUYS.map((groupBuy) => (
+          groupBuys.map((groupBuy) => (
             <div
               key={groupBuy.id}
-              onClick={() => handleChatClick(groupBuy.id)}
-              className="w-full bg-white rounded-3xl p-5 shadow-sm border border-rose-50 hover:border-rose-200 hover:shadow-md active:scale-[0.99] transition-all cursor-pointer group"
+              onClick={() => handleChatClick(groupBuy)}
+              className='w-full bg-white rounded-3xl p-5 shadow-sm border border-rose-50 hover:border-rose-200 hover:shadow-md active:scale-[0.99] transition-all cursor-pointer group'
             >
               <div className="flex items-start gap-4">
                 {/* Avatar */}
-                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                  <span className="text-lg font-bold text-gray-600">
+                <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
+                  <span className="text-lg font-bold text-rose-500">
                     {groupBuy.author.charAt(0)}
                   </span>
                 </div>
@@ -97,11 +114,6 @@ export default function GroupBuyChatList() {
                       </div>
                       <p className="text-sm text-gray-500 mb-1">게시자: {groupBuy.author}</p>
                     </div>
-                    {groupBuy.unreadCount > 0 && (
-                      <span className="ml-2 px-2 py-0.5 bg-rose-500 text-white text-xs font-bold rounded-full flex-shrink-0">
-                        {groupBuy.unreadCount}
-                      </span>
-                    )}
                   </div>
 
                   {/* Last Message */}
