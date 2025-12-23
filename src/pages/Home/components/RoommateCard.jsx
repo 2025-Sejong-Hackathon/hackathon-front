@@ -47,10 +47,10 @@ export default function RoommateCard({
         </div>
 
         {/* Info */}
-        <div className='flex flex-col items-center text-white mb-2'>
-          <h3 className='font-bold text-xl mb-1'>{name}</h3>
-          <p className='text-xs opacity-90 font-medium mb-1'>
-            {major} / {grade}
+        <div className='flex flex-col items-center text-white mb-2 w-full'>
+          <h3 className='font-bold text-xl mb-1 truncate w-full text-center px-1'>{name}</h3>
+          <p className='text-xs opacity-90 font-medium mb-1 truncate w-full text-center'>
+            {major} / {grade}학년
           </p>
           {/* Match Score */}
           {matchScore !== undefined && (
