@@ -1,7 +1,12 @@
 export default function DailyLaundryInfo() {
-  // More jagged/uneven data for visual variety
-  const congestionData = [25, 65, 30, 80, 40, 85, 35, 75, 20, 90, 45, 70, 30, 60];
-  const currentTimeIndex = 4; // 현재 시간 표시용
+  // 0시부터 23시까지의 혼잡도 데이터 (0~2 범위)
+  // 0: 여유, 1: 보통, 2: 혼잡
+  const congestionData = [
+    0.2, 0.1, 0.1, 0.2, 0.3, 0.5, 0.8, 1.2, 1.5, 1.8, 1.6, 1.4,
+    1.5, 1.3, 1.1, 0.9, 1.0, 1.3, 1.6, 1.8, 1.9, 1.5, 1.0, 0.5
+  ];
+  
+  const currentHour = new Date().getHours(); // 현재 시간 (0~23)
 
   return (
     <div className="flex flex-col w-full">
@@ -34,37 +39,119 @@ export default function DailyLaundryInfo() {
         </div>
       </div>
 
-      {/* 그래프 영역 */}
+      {/* 꺾은선 그래프 영역 */}
       <div className="w-full pt-4">
-        <div className="flex items-end justify-between h-20 gap-1.5 px-1">
-          {congestionData.map((height, index) => (
-            <div key={index} className="flex-1 flex flex-col items-center group relative">
-              {/* 호버 시 값 표시 */}
-              <div className="absolute -top-6 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                {height}%
-              </div>
-              <div 
-                className={`w-full rounded-t-full transition-all duration-700 ${
-                  index === currentTimeIndex 
-                    ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]' 
-                    : height > 70 ? 'bg-rose-200' : 'bg-blue-100'
+        <div className="relative w-full h-40 mb-4">
+          <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="w-full h-full"
+          >
+            {/* 그리드 라인 (선택적) */}
+            <defs>
+              <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.3" />
+              </linearGradient>
+            </defs>
+            
+            {/* 영역 채우기 (그래프 아래) */}
+            <path
+              d={`M 0,${100 - (congestionData[0] / 2) * 100} ${congestionData
+                .map((value, index) => {
+                  const x = (index / (congestionData.length - 1)) * 100;
+                  const y = 100 - (value / 2) * 100;
+                  return `L ${x},${y}`;
+                })
+                .join(' ')} L 100,100 L 0,100 Z`}
+              fill="url(#lineGradient)"
+              opacity="0.2"
+            />
+            
+            {/* 꺾은선 */}
+            <polyline
+              points={congestionData
+                .map((value, index) => {
+                  const x = (index / (congestionData.length - 1)) * 100;
+                  const y = 100 - (value / 2) * 100;
+                  return `${x},${y}`;
+                })
+                .join(' ')}
+              fill="none"
+              stroke="#f43f5e"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            
+            {/* 현재 시간 포인트 */}
+            {congestionData.map((value, index) => {
+              if (index === currentHour) {
+                const x = (index / (congestionData.length - 1)) * 100;
+                const y = 100 - (value / 2) * 100;
+                return (
+                  <g key={`current-${index}`}>
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r="3"
+                      fill="#f43f5e"
+                      stroke="#fff"
+                      strokeWidth="2"
+                    />
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r="6"
+                      fill="#f43f5e"
+                      opacity="0.3"
+                    />
+                  </g>
+                );
+              }
+              return null;
+            })}
+            
+            {/* 모든 포인트 */}
+            {congestionData.map((value, index) => {
+              const x = (index / (congestionData.length - 1)) * 100;
+              const y = 100 - (value / 2) * 100;
+              return (
+                <circle
+                  key={index}
+                  cx={x}
+                  cy={y}
+                  r="1.5"
+                  fill={index === currentHour ? '#f43f5e' : '#fda4af'}
+                  className="hover:r-2 transition-all"
+                />
+              );
+            })}
+          </svg>
+        </div>
+        
+        {/* X축 시간 레이블 */}
+        <div className="flex justify-between mt-2 px-1 border-t border-gray-100 pt-2">
+          {[0, 6, 12, 18, 23].map((hour) => (
+            <div key={hour} className="text-center">
+              <span
+                className={`text-[10px] font-bold ${
+                  hour === currentHour
+                    ? 'text-rose-500 underline underline-offset-4'
+                    : 'text-gray-400'
                 }`}
-                style={{ height: `${height}%` }}
-              />
+              >
+                {hour}시
+              </span>
             </div>
           ))}
         </div>
         
-        <div className="flex justify-between mt-3 px-1 border-t border-gray-50 pt-2">
-          {congestionData.map((_, index) => (
-            <div key={index} className="flex-1 text-center">
-              <span className={`text-[10px] font-bold ${
-                index === currentTimeIndex ? 'text-rose-500 underline underline-offset-4' : 'text-gray-400'
-              }`}>
-                {index}
-              </span>
-            </div>
-          ))}
+        {/* Y축 레이블 (혼잡도 범위) */}
+        <div className="flex justify-between items-center mt-2 text-[10px] text-gray-400">
+          <span>여유 (0)</span>
+          <span>보통 (1)</span>
+          <span>혼잡 (2)</span>
         </div>
       </div>
     </div>
