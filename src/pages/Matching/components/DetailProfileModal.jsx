@@ -31,7 +31,7 @@ export default function DetailProfileModal({ isOpen, onClose, profile, onPick, o
     name: "이채원",
     major: "컴퓨터공학과",
     grade: "4학년",
-    mbti: "MCSE", // Using MCSE as in the original code, or map to MBTI
+    geekBti: "MCSE",
     quote: "안녕하세요 저 깔끔쟁이!",
     lifestyle: [
       { label: '흡연', value: '안함' },
@@ -71,7 +71,7 @@ export default function DetailProfileModal({ isOpen, onClose, profile, onPick, o
                     name={displayProfile.name}
                     major={displayProfile.major}
                     grade={displayProfile.grade}
-                    mbti={displayProfile.mbti}
+                    geekBti={displayProfile.geekBti}
                     quote={displayProfile.quote}
                 />
             </div>

@@ -22,16 +22,16 @@ export default function RoommateCard({
       {/* Glass Effect Overlay */}
       <div className='absolute inset-0 bg-white/10 backdrop-blur-[1px]' />
 
-      <div className='relative z-10 flex flex-col items-center h-full pt-6 px-3'>
+      <div className='relative z-10 flex flex-col items-center h-full pt-4 px-3 pb-6'>
         {/* GeekBTI Badge */}
-        <div className='bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full border border-white/30 mb-4'>
+        <div className='bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full border border-white/30 mb-3'>
           <span className='text-white font-bold text-lg tracking-wider'>
             {geekBti}
           </span>
         </div>
 
         {/* Character Image */}
-        <div className='w-24 h-24 mb-3'>
+        <div className='w-24 h-24 mb-2'>
           {characterImage ? (
             <img
               src={characterImage}
@@ -54,11 +54,12 @@ export default function RoommateCard({
         </div>
 
         {/* Quote */}
-        <div className='mt-auto mb-6 text-center'>
-          <span className='text-white/60 text-2xl font-serif'>“</span>
-          <p className='text-white text-[10px] leading-tight px-1 -mt-2 break-keep'>
-            {quote}
-          </p>
+        <div className='mt-auto w-full'>
+          <div className='bg-white/30 backdrop-blur-sm rounded-2xl px-2 pb-2 text-center shadow-sm'>
+            <p className='text-white text-[10px] leading-tight px-1 pt-2 break-keep'>
+              {quote}
+            </p>
+          </div>
         </div>
       </div>
     </div>
