@@ -5,6 +5,7 @@ import DetailProfileModal from '../Matching/components/DetailProfileModal';
 import TogetherIcon from '../../assets/together.svg';
 import LikeIcon from '../../assets/like.svg';
 import MotorcycleIcon from '../../assets/오토바이.png';
+import DietIcon from '../../assets/diet.png';
 
 export default function Home() {
   const [isRecommendOn, setIsRecommendOn] = useState(true);
@@ -307,6 +308,33 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Today's Diet Section */}
+      <section className='mt-10 mb-4'>
+        <div className='flex items-center justify-between mb-4'>
+          <h2 className='text-xl font-bold text-gray-900'>오늘의 식단 🍱</h2>
+          <span className='text-xs font-bold text-gray-400'>12월 24일 (수)</span>
+        </div>
+        <div className='bg-white rounded-[32px] p-6 shadow-sm border border-rose-50 flex items-center gap-6 relative overflow-hidden'>
+          <div className='w-24 h-24 flex-shrink-0'>
+            <img src={DietIcon} alt='식단' className='w-full h-full object-contain' />
+          </div>
+          <div className='flex flex-col gap-3 flex-1'>
+            <div className='flex items-center gap-3'>
+              <span className='px-2 py-0.5 bg-orange-50 text-orange-500 text-[10px] font-bold rounded-md w-9 text-center'>조식</span>
+              <span className='text-sm text-gray-700 font-semibold truncate'>전복죽, 미역국, 계란말이</span>
+            </div>
+            <div className='flex items-center gap-3'>
+              <span className='px-2 py-0.5 bg-rose-50 text-rose-500 text-[10px] font-bold rounded-md w-9 text-center'>중식</span>
+              <span className='text-sm text-gray-700 font-semibold truncate'>제육볶음, 된장찌개, 상추쌈</span>
+            </div>
+            <div className='flex items-center gap-3'>
+              <span className='px-2 py-0.5 bg-indigo-50 text-indigo-500 text-[10px] font-bold rounded-md w-9 text-center'>석식</span>
+              <span className='text-sm text-gray-700 font-semibold truncate'>치킨커리, 난, 그린샐러드</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Detail Profile Modal */}
       <DetailProfileModal
