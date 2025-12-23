@@ -21,6 +21,8 @@ import GroupBuyList from './pages/GroupBuy/GroupBuyList.jsx';
 import GroupBuyDetail from './pages/GroupBuy/GroupBuyDetail.jsx';
 import GroupBuyCreate from './pages/GroupBuy/GroupBuyCreate.jsx';
 import GroupBuyChatList from './pages/GroupBuy/GroupBuyChatList.jsx';
+import Mypage from './pages/Mypage/Mypage.jsx';
+import RoommateEvaluation from './pages/Mypage/RoommateEvaluation.jsx';
 
 export default function App() {
   return (
@@ -36,9 +38,10 @@ export default function App() {
             <Route path='/group-buy/create' element={<GroupBuyCreate />} />
             <Route path='/group-buy/chats' element={<GroupBuyChatList />} />
             <Route path='/group-buy/:id' element={<GroupBuyDetail />} />
+            <Route path='/mypage' element={<Mypage />} />
             <Route
-              path='/mypage'
-              element={<Placeholder title='마이페이지' />}
+              path='/mypage/roommate-evaluation'
+              element={<RoommateEvaluation />}
             />
             <Route path='/matching/mutual' element={<MutualPick />} />
           </Route>
