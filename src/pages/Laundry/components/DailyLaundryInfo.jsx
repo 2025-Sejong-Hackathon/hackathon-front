@@ -1,9 +1,9 @@
 export default function DailyLaundryInfo() {
-  // 0시부터 23시까지의 혼잡도 데이터 (0~2 범위)
-  // 0: 여유, 1: 보통, 2: 혼잡
+  // 0시부터 23시까지의 혼잡도 데이터 (0~3 범위)
+  // 0: 여유, 1: 보통, 2: 혼잡, 3: 매우 혼잡
   const congestionData = [
-    0.2, 0.1, 0.1, 0.2, 0.3, 0.5, 0.8, 1.2, 1.5, 1.8, 1.6, 1.4,
-    1.5, 1.3, 1.1, 0.9, 1.0, 1.3, 1.6, 1.8, 1.9, 1.5, 1.0, 0.5
+    0.3, 0.2, 0.2, 0.3, 0.5, 0.8, 1.2, 1.8, 2.2, 2.5, 2.3, 2.0,
+    2.2, 1.9, 1.6, 1.3, 1.5, 1.9, 2.3, 2.6, 2.8, 2.3, 1.5, 0.8
   ];
   
   const currentHour = new Date().getHours(); // 현재 시간 (0~23)
@@ -57,10 +57,10 @@ export default function DailyLaundryInfo() {
             
             {/* 영역 채우기 (그래프 아래) */}
             <path
-              d={`M 0,${100 - (congestionData[0] / 2) * 100} ${congestionData
+              d={`M 0,${100 - (congestionData[0] / 3) * 100} ${congestionData
                 .map((value, index) => {
                   const x = (index / (congestionData.length - 1)) * 100;
-                  const y = 100 - (value / 2) * 100;
+                  const y = 100 - (value / 3) * 100;
                   return `L ${x},${y}`;
                 })
                 .join(' ')} L 100,100 L 0,100 Z`}
@@ -73,7 +73,7 @@ export default function DailyLaundryInfo() {
               points={congestionData
                 .map((value, index) => {
                   const x = (index / (congestionData.length - 1)) * 100;
-                  const y = 100 - (value / 2) * 100;
+                  const y = 100 - (value / 3) * 100;
                   return `${x},${y}`;
                 })
                 .join(' ')}
@@ -88,7 +88,7 @@ export default function DailyLaundryInfo() {
             {congestionData.map((value, index) => {
               if (index === currentHour) {
                 const x = (index / (congestionData.length - 1)) * 100;
-                const y = 100 - (value / 2) * 100;
+                const y = 100 - (value / 3) * 100;
                 return (
                   <g key={`current-${index}`}>
                     <circle
@@ -115,7 +115,7 @@ export default function DailyLaundryInfo() {
             {/* 모든 포인트 */}
             {congestionData.map((value, index) => {
               const x = (index / (congestionData.length - 1)) * 100;
-              const y = 100 - (value / 2) * 100;
+              const y = 100 - (value / 3) * 100;
               return (
                 <circle
                   key={index}
@@ -152,6 +152,7 @@ export default function DailyLaundryInfo() {
           <span>여유 (0)</span>
           <span>보통 (1)</span>
           <span>혼잡 (2)</span>
+          <span>매우 혼잡 (3)</span>
         </div>
       </div>
     </div>
