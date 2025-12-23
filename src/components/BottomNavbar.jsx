@@ -57,31 +57,34 @@ export default function BottomNavbar() {
   ];
 
   return (
-    <div className="fixed bottom-8 w-full max-w-[500px] px-6 z-50 pointer-events-none">
+    <div className='fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] z-50 pointer-events-none'>
       {/* 네비게이션 바 배경 */}
-      <div className="relative w-full h-[70px] bg-white rounded-[35px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] flex items-center justify-around pointer-events-auto">
+      <div className='relative w-full min-h-[70px] bg-white rounded-t-[35px] shadow-[0_-4px_20px_rgba(0,0,0,0.1)] flex items-end justify-around pointer-events-auto px-6 pt-4 pb-10'>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
 
           return (
-            <div key={item.id} className="relative w-14 h-full flex flex-col items-center justify-center">
+            <div
+              key={item.id}
+              className='relative w-14 h-full flex flex-col items-center justify-center'
+            >
               {isActive && (
                 // 활성화된 탭 영역
-                <div className="absolute -top-7 flex flex-col items-center justify-center">
+                <div className='absolute -top-7 flex flex-col items-center justify-center'>
                   {/* 1. 흰색 배경 원 (테두리 역할) */}
                   {/* - 그림자를 위쪽으로만 주어서 아래쪽은 네비바와 자연스럽게 연결되도록 함 */}
                   {/* - w-[70px]로 빨간 원보다 크게 설정 */}
-                  <div className="w-[70px] h-[70px] bg-white rounded-full absolute top-0 shadow-[0_-6px_8px_-2px_rgba(0,0,0,0.1)]"></div>
-                  
+                  <div className='w-[76px] h-[76px] bg-white rounded-full absolute top-0 shadow-[0_-6px_8px_-2px_rgba(0,0,0,0.1)]'></div>
+
                   {/* 2. 네비바와 겹치는 부분의 그림자 제거를 위한 가림막 (선택적, 더 완벽한 결합을 위해) */}
-                  <div className="w-[70px] h-[35px] bg-white absolute top-[35px] left-0"></div>
+                  <div className='w-[76px] h-[38px] bg-white absolute top-[38px] left-0'></div>
 
                   {/* 3. 실제 빨간색 버튼 */}
-                  <div className="relative w-[58px] h-[58px] bg-rose-500 rounded-full flex items-center justify-center z-10 top-0">
-                    <img 
-                      src={item.activeIcon} 
-                      alt={item.label} 
-                      className="w-7 h-7 object-contain"
+                  <div className='relative w-[58px] h-[58px] bg-rose-500 rounded-full flex items-center justify-center z-10 top-[9px]'>
+                    <img
+                      src={item.activeIcon}
+                      alt={item.label}
+                      className='w-[30px] h-[30px] object-contain'
                     />
                   </div>
                 </div>
@@ -92,14 +95,16 @@ export default function BottomNavbar() {
                 onClick={() => navigate(item.path)}
                 className={`flex flex-col items-center justify-center w-full h-full ${isActive ? 'opacity-0 pointer-events-none' : 'opacity-100'} transition-opacity duration-200 z-20`}
               >
-                <div className="w-7 h-7 flex items-center justify-center mb-1">
-                  <img 
-                    src={item.icon} 
-                    alt={item.label} 
-                    className="w-full h-full object-contain"
+                <div className='w-[30px] h-[30px] flex items-center justify-center mb-1'>
+                  <img
+                    src={item.icon}
+                    alt={item.label}
+                    className='w-full h-full object-contain'
                   />
                 </div>
-                <span className="text-[11px] text-gray-400 font-medium">{item.label}</span>
+                <span className='text-[14px] text-gray-400 font-medium'>
+                  {item.label}
+                </span>
               </button>
             </div>
           );
