@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 
 export default function DailyLaundryInfo({ genderZone }) {
   const [congestionData, setCongestionData] = useState([]);
-  const [messages, setMessages] = useState({ peak: '', recommend: '' });
+  const [messages, setMessages] = useState({
+    peak: '',
+    recommend: '',
+    laundry: '',
+  });
   const [selectedDate, setSelectedDate] = useState(new Date()); // 선택된 날짜 상태 추가
   const currentHour = new Date().getHours();
 
@@ -57,20 +61,31 @@ export default function DailyLaundryInfo({ genderZone }) {
           const data = await response.json();
           console.log('Congestion Data:', data);
 
-          if (data.data) {
+          // 신규 API 스키마 대응 (data.data.congestionForecastResponse)
+          const congestionInfo = data.data?.congestionForecastResponse;
+          const laundryMsg = data.data?.laundryMessage;
+
+          if (congestionInfo) {
             const timeline = new Array(24).fill(0);
-            data.data.timeline.forEach((item) => {
+            congestionInfo.timeline.forEach((item) => {
               timeline[item.hour] = item.predicted_congestion;
             });
             setCongestionData(timeline);
             setMessages({
-              peak: data.data.peak_message || '데이터 없음',
-              recommend: data.data.recommend_message || '데이터 없음',
+              peak: congestionInfo.peak_message || '데이터 없음',
+              recommend: congestionInfo.recommend_message || '데이터 없음',
+              laundry:
+                laundryMsg?.laundry_message ||
+                '오늘의 세탁 정보를 불러올 수 없습니다.',
             });
           } else {
             // 데이터가 없는 경우 (예: 미래 날짜)
             setCongestionData([]);
-            setMessages({ peak: '데이터 없음', recommend: '데이터 없음' });
+            setMessages({
+              peak: '데이터 없음',
+              recommend: '데이터 없음',
+              laundry: '데이터 없음',
+            });
           }
         }
       } catch (err) {
@@ -144,6 +159,11 @@ export default function DailyLaundryInfo({ genderZone }) {
       </div>
 
       <div className='space-y-3 mb-8'>
+        <div className='flex items-start gap-2'>
+          <p className='text-[14px] text-gray-700 font-medium pt-0.5'>
+            {messages.laundry}
+          </p>
+        </div>
         <div className='flex items-start gap-2'>
           <p className='text-[14px] text-gray-700 font-medium pt-0.5'>
             {messages.peak}
