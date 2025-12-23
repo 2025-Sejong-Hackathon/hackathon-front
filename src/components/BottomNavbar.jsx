@@ -61,7 +61,13 @@ export default function BottomNavbar() {
       {/* 네비게이션 바 배경 */}
       <div className='relative w-full min-h-[70px] bg-white rounded-t-[35px] shadow-[0_-4px_20px_rgba(0,0,0,0.1)] flex items-end justify-around pointer-events-auto px-6 pt-4 pb-10'>
         {navItems.map((item) => {
-          const isActive = location.pathname === item.path;
+          // 홈 탭의 경우, / 또는 /matching으로 시작하는 경로에서도 활성화
+          let isActive = location.pathname === item.path;
+          if (item.id === 'home') {
+            isActive =
+              location.pathname === '/' ||
+              location.pathname.startsWith('/matching');
+          }
 
           return (
             <div
