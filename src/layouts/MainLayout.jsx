@@ -1,13 +1,15 @@
 import { Outlet } from 'react-router-dom';
+import BottomNavbar from '../components/BottomNavbar';
 
 export default function MainLayout() {
   return (
-    <>
-      <header className='p-4 border-b'>헤더</header>
-      <main className='p-4'>
-        <Outlet />
-      </main>
-      <footer className='p-4 border-t'>푸터</footer>
-    </>
+    <div className="w-full min-h-screen bg-[#F2F4F6] flex justify-center">
+      <div className="w-full max-w-[500px] bg-[#F2F4F6] relative min-h-screen flex flex-col shadow-2xl">
+        <main className="flex-1 flex flex-col pb-[100px]">
+          <Outlet />
+        </main>
+        <BottomNavbar />
+      </div>
+    </div>
   );
 }
