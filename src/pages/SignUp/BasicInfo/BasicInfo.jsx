@@ -26,7 +26,7 @@ export default function BasicInfo() {
         const data = await response.json();
         if (!response.ok) throw new Error(`HTTP Error - ${response.status}`);
         console.log(data);
-        setUser(data);
+        setUser(data.data);
       } catch (err) {
         alert(err);
       }
@@ -59,10 +59,10 @@ export default function BasicInfo() {
 
       <div className='mb-8'>
         <h3 className='text-white font-bold text-lg mb-4'>성별</h3>
-        <div className='flex gap-4 w-full'>
+        <div className='flex gap-8 justify-center w-full px-4'>
           <button
             onClick={() => setGender('female')}
-            className='flex-1 transition-transform active:scale-95'
+            className='flex-1 max-w-[140px] transition-transform active:scale-95'
           >
             <img
               src={gender === 'female' ? FemaleSelectIcon : FemaleIcon}
@@ -72,7 +72,7 @@ export default function BasicInfo() {
           </button>
           <button
             onClick={() => setGender('male')}
-            className='flex-1 transition-transform active:scale-95'
+            className='flex-1 max-w-[140px] transition-transform active:scale-95'
           >
             <img
               src={gender === 'male' ? MaleSelectIcon : MaleIcon}
@@ -97,7 +97,18 @@ export default function BasicInfo() {
 
       {/* Next Button */}
       <button
-        onClick={() => navigate('/signup/lifestyle')}
+        onClick={() => {
+          if (!birthdate) {
+            alert('생년월일을 입력해주세요.');
+            return;
+          }
+          navigate('/signup/lifestyle', { 
+            state: { 
+              gender: gender.toUpperCase(), 
+              birthDate: birthdate 
+            } 
+          });
+        }}
         className='w-full bg-white/30 hover:bg-white/40 text-white text-lg font-bold p-4 rounded-2xl mt-8 transition-colors backdrop-blur-sm'
       >
         다음
