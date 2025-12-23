@@ -1,8 +1,11 @@
 import Character1 from '../../../assets/character1.svg';
 
-export default function HorizontalRoommateCard({ name, major, grade, mbti, quote }) {
+export default function HorizontalRoommateCard({ name, major, grade, mbti, quote, onClick }) {
   return (
-    <div className="w-full bg-white rounded-[24px] p-5 flex items-center gap-5 shadow-[0_2px_15px_rgba(0,0,0,0.03)] border border-gray-50 active:scale-[0.98] transition-transform">
+    <div 
+      onClick={onClick}
+      className="w-full bg-white rounded-[24px] p-5 flex items-center gap-5 shadow-[0_2px_15px_rgba(0,0,0,0.03)] border border-gray-50 active:scale-[0.98] transition-transform cursor-pointer"
+    >
       {/* Profile Image Area */}
       <div className="relative">
         <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">

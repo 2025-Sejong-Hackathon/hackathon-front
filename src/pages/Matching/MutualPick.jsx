@@ -64,7 +64,11 @@ export default function MutualPick() {
           </div>
           
           {MUTUAL_MATCHES.map((match) => (
-            <HorizontalRoommateCard key={match.id} {...match} />
+            <HorizontalRoommateCard 
+              key={match.id} 
+              {...match} 
+              onClick={() => navigate(`/matching/chat/${match.id}`, { state: { name: match.name } })}
+            />
           ))}
         </div>
       </div>

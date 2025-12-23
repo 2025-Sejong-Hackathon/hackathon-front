@@ -23,6 +23,9 @@ import GroupBuyCreate from './pages/GroupBuy/GroupBuyCreate.jsx';
 import GroupBuyChatList from './pages/GroupBuy/GroupBuyChatList.jsx';
 import Mypage from './pages/Mypage/Mypage.jsx';
 import RoommateEvaluation from './pages/Mypage/RoommateEvaluation.jsx';
+import ReceivePick from './pages/Matching/ReceivePick.jsx';
+
+import ChatRoom from './pages/Matching/ChatRoom.jsx';
 
 export default function App() {
   return (
@@ -44,6 +47,8 @@ export default function App() {
               element={<RoommateEvaluation />}
             />
             <Route path='/matching/mutual' element={<MutualPick />} />
+            <Route path='/matching/receive' element={<ReceivePick />} />
+            <Route path='/matching/chat/:id' element={<ChatRoom />} />
           </Route>
 
           <Route element={<AuthLayout />}>

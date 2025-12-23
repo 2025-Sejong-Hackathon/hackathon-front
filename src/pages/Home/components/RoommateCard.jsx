@@ -1,8 +1,11 @@
 import Character1 from '../../../assets/character1.svg';
 
-export default function RoommateCard({ name, major, grade, mbti, quote, isLast }) {
+export default function RoommateCard({ name, major, grade, mbti, quote, isLast, onClick }) {
   return (
-    <div className={`flex-shrink-0 w-[160px] h-[280px] rounded-[20px] relative overflow-hidden bg-white shadow-md ${isLast ? 'mr-6' : ''}`}>
+    <div 
+      onClick={onClick}
+      className={`flex-shrink-0 w-[160px] h-[280px] rounded-[20px] relative overflow-hidden bg-white shadow-md cursor-pointer hover:scale-[1.02] transition-transform ${isLast ? 'mr-6' : ''}`}
+    >
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#F48E98] to-[#DA4C5E] opacity-90" />
       

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RoommateCard from './components/RoommateCard';
+import DetailProfileModal from '../Matching/components/DetailProfileModal';
 
 const MOCK_ROOMMATES = [
   {
@@ -31,7 +32,19 @@ const MOCK_ROOMMATES = [
 
 export default function Home() {
   const [isRecommendOn, setIsRecommendOn] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRoommate, setSelectedRoommate] = useState(null);
   const navigate = useNavigate();
+
+  const handleCardClick = (roommate) => {
+    setSelectedRoommate(roommate);
+    setIsModalOpen(true);
+  };
+
+  const handlePick = () => {
+    alert(`${selectedRoommate?.name}님에게 PICK 요청을 보냈습니다!`);
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="w-full flex flex-col px-6 pt-12">
@@ -70,7 +83,10 @@ export default function Home() {
           </svg>
         </button>
 
-        <button className="w-full bg-white rounded-3xl p-4 flex items-center justify-between shadow-sm border border-rose-100 hover:border-rose-200 active:scale-[0.99] transition-all">
+        <button 
+          onClick={() => navigate('/matching/receive')}
+          className="w-full bg-white rounded-3xl p-4 flex items-center justify-between shadow-sm border border-rose-100 hover:border-rose-200 active:scale-[0.99] transition-all"
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">
               👈
@@ -99,10 +115,19 @@ export default function Home() {
               key={roommate.id}
               {...roommate}
               isLast={index === MOCK_ROOMMATES.length - 1}
+              onClick={() => handleCardClick(roommate)}
             />
           ))}
         </div>
       </div>
+
+      {/* Detail Profile Modal */}
+      <DetailProfileModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        profile={selectedRoommate}
+        onPick={handlePick}
+      />
     </div>
   );
 }
