@@ -17,6 +17,10 @@ import Placeholder from './pages/Placeholder.jsx';
 import MutualPick from './pages/Matching/MutualPick.jsx';
 import NewsList from './pages/News/NewsList.jsx';
 import NewsDetail from './pages/News/NewsDetail.jsx';
+import GroupBuyList from './pages/GroupBuy/GroupBuyList.jsx';
+import GroupBuyDetail from './pages/GroupBuy/GroupBuyDetail.jsx';
+import GroupBuyCreate from './pages/GroupBuy/GroupBuyCreate.jsx';
+import GroupBuyChatList from './pages/GroupBuy/GroupBuyChatList.jsx';
 
 export default function App() {
   return (
@@ -28,7 +32,10 @@ export default function App() {
             <Route path='/news' element={<NewsList />} />
             <Route path='/news/:id' element={<NewsDetail />} />
             <Route path='/laundry' element={<Placeholder title='세탁' />} />
-            <Route path='/group-buy' element={<Placeholder title='공구' />} />
+            <Route path='/group-buy' element={<GroupBuyList />} />
+            <Route path='/group-buy/create' element={<GroupBuyCreate />} />
+            <Route path='/group-buy/chats' element={<GroupBuyChatList />} />
+            <Route path='/group-buy/:id' element={<GroupBuyDetail />} />
             <Route
               path='/mypage'
               element={<Placeholder title='마이페이지' />}
