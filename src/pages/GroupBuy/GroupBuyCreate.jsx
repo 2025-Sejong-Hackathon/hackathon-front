@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const MAIN_CATEGORIES = ['음식', '물품'];
+// 하드코딩된 하위 카테고리 목록 (API 데이터와 매핑용)
 const FOOD_CATEGORIES = [
   '한식',
   '카페',
@@ -24,18 +25,73 @@ export default function GroupBuyCreate() {
   const [maxParticipants, setMaxParticipants] = useState('');
   const [productLink, setProductLink] = useState('');
   const [description, setDescription] = useState('');
+  
+  const [categories, setCategories] = useState([]); // API에서 받아온 카테고리 목록
 
-  const handleSubmit = () => {
-    // TODO: API 호출
-    console.log({
-      mainCategory,
-      subCategory,
-      title,
-      maxParticipants,
-      productLink,
-      description,
-    });
-    navigate('/group-buy');
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/api/v1/groupbuys/categories`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleSubmit = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const accessToken = localStorage.getItem('accessToken');
+
+      // 선택된 카테고리 이름으로 ID 찾기
+      const selectedCategoryName = mainCategory === '물품' ? '물품' : subCategory;
+      const targetCategory = categories.find(c => c.name === selectedCategoryName);
+      
+      if (!targetCategory) {
+        alert('카테고리 정보를 찾을 수 없습니다.');
+        return;
+      }
+
+      // description에 링크 포함
+      const fullDescription = productLink 
+        ? `${description}\n\n[제품 링크]: ${productLink}` 
+        : description;
+
+      const response = await fetch(`${API_URL}/api/v1/groupbuys`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          categoryId: targetCategory.id,
+          title: title,
+          description: fullDescription,
+          targetCount: parseInt(maxParticipants, 10),
+        }),
+      });
+
+      if (response.ok) {
+        alert('공동구매가 등록되었습니다!');
+        navigate('/group-buy');
+      } else {
+        const err = await response.json();
+        alert(err.message || '등록에 실패했습니다.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('오류가 발생했습니다.');
+    }
   };
 
   // 물품일 때는 subCategory가 자동으로 '물품'으로 설정되므로, 음식일 때만 subCategory 체크
@@ -43,8 +99,7 @@ export default function GroupBuyCreate() {
     (mainCategory === '물품' || subCategory) &&
     title &&
     maxParticipants &&
-    productLink &&
-    description;
+    description; // productLink는 선택사항일 수 있으므로 필수에서 제외 가능하지만 기존 로직 유지시 포함
 
   return (
     <div className='w-full flex flex-col min-h-screen'>

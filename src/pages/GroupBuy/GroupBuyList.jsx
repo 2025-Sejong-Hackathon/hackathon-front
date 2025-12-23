@@ -1,80 +1,80 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EditPencilIcon from '../../assets/Edit Pencil.svg';
 import ChatBubbleIcon from '../../assets/Chat Bubble.svg';
 
-const CATEGORIES = [
-  '전체',
-  '한식',
-  '일식',
-  '중식',
-  '양식',
-  '카페',
-  '디저트',
-  '치킨',
-  '패스트푸드',
-  '분식',
-  '피자',
-  '물품',
-  '기타',
-];
-
-const MOCK_GROUP_BUYS = [
-  {
-    id: 1,
-    title: '호랑이비빕밥 같이 먹어요',
-    category: '한식',
-    currentParticipants: 1,
-    maxParticipants: 3,
-    author: '박승희',
-    deadline: '5시 30분까지',
-  },
-  {
-    id: 2,
-    title: '호랑이비빕밥 같이 먹어요',
-    category: '한식',
-    currentParticipants: 2,
-    maxParticipants: 3,
-    author: '김철수',
-    deadline: '6시까지',
-  },
-  {
-    id: 3,
-    title: '호랑이비빕밥 같이 먹어요',
-    category: '한식',
-    currentParticipants: 0,
-    maxParticipants: 3,
-    author: '이영희',
-    deadline: '7시까지',
-  },
-  {
-    id: 4,
-    title: '호랑이비빕밥 같이 먹어요',
-    category: '한식',
-    currentParticipants: 0,
-    maxParticipants: 3,
-    author: '최민수',
-    deadline: '8시까지',
-  },
-  {
-    id: 5,
-    title: '아이깨끗해 공구',
-    category: '물품',
-    currentParticipants: 2,
-    maxParticipants: 5,
-    author: '정수진',
-    deadline: '내일까지',
-  },
-];
-
 export default function GroupBuyList() {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [selectedCategory, setSelectedCategory] = useState({ id: 'ALL', name: '전체' });
+  const [categories, setCategories] = useState([{ id: 'ALL', name: '전체' }]);
+  const [groupBuys, setGroupBuys] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredGroupBuys =
-    selectedCategory === '전체'
-      ? MOCK_GROUP_BUYS
-      : MOCK_GROUP_BUYS.filter((item) => item.category === selectedCategory);
+  // 카테고리 목록 조회
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/api/v1/groupbuys/categories`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          // 전체 카테고리 추가
+          setCategories([{ id: 'ALL', name: '전체' }, ...data.data]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // 공구 목록 조회 (카테고리 변경 시 호출)
+  useEffect(() => {
+    const fetchGroupBuys = async () => {
+      setLoading(true);
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        let url = `${API_URL}/api/v1/groupbuys`;
+        
+        // 특정 카테고리 선택 시 해당 API 호출
+        if (selectedCategory.id !== 'ALL') {
+          url = `${API_URL}/api/v1/groupbuys/category/${selectedCategory.id}`;
+        }
+
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // API 응답 매핑
+          const mappedData = data.data.content.map(item => ({
+            id: item.id,
+            title: item.title,
+            category: item.categoryName, // API 응답에 categoryName이 있다고 가정 (apidocs 참조)
+            currentParticipants: item.currentCount,
+            maxParticipants: item.targetCount,
+            author: item.memberName,
+            deadline: new Date(item.createdAt).toLocaleDateString(), // 생성일 또는 마감일 로직 필요 (API엔 deadline 없음, 임시로 createdAt 사용)
+            status: item.status
+          }));
+          setGroupBuys(mappedData);
+        }
+      } catch (err) {
+        console.error('Failed to fetch group buys:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroupBuys();
+  }, [selectedCategory]);
 
   const handleGroupBuyClick = (id) => {
     navigate(`/group-buy/${id}`);
@@ -100,17 +100,17 @@ export default function GroupBuyList() {
       {/* Category Filter */}
       <div className='px-6 pb-4'>
         <div className='flex gap-3 overflow-x-auto scrollbar-hide pb-2'>
-          {CATEGORIES.map((category) => (
+          {categories.map((category) => (
             <button
-              key={category}
+              key={category.id}
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full text-base font-medium whitespace-nowrap transition-all ${
-                selectedCategory === category
+                selectedCategory.id === category.id
                   ? 'bg-rose-500 text-white shadow-sm'
                   : 'bg-white text-gray-700 border border-gray-200 hover:border-rose-200'
               }`}
             >
-              {category}
+              {category.name}
             </button>
           ))}
         </div>
@@ -118,13 +118,15 @@ export default function GroupBuyList() {
 
       {/* Group Buy List */}
       <div className='flex flex-col px-6 pb-32 gap-3'>
-        {filteredGroupBuys.length === 0 ? (
+        {loading ? (
+           <div className='flex justify-center py-10 text-gray-400'>로딩 중...</div>
+        ) : groupBuys.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-16'>
             <p className='text-gray-400 text-lg mb-2'>등록된 공구가 없습니다</p>
             <p className='text-gray-300 text-sm'>첫 공구를 등록해보세요!</p>
           </div>
         ) : (
-          filteredGroupBuys.map((groupBuy) => (
+          groupBuys.map((groupBuy) => (
             <div
               key={groupBuy.id}
               onClick={() => handleGroupBuyClick(groupBuy.id)}
@@ -135,7 +137,7 @@ export default function GroupBuyList() {
                   <div className='flex items-center gap-2 mb-2'>
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        groupBuy.category === '물품'
+                        groupBuy.category === '물품' // 카테고리 이름에 따라 색상 분기 로직 수정 필요할 수 있음
                           ? 'bg-blue-100 text-blue-600'
                           : 'bg-rose-100 text-rose-600'
                       }`}
