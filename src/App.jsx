@@ -1,4 +1,4 @@
-import { useNavigate, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home/Home.jsx';
 import MainLayout from './layouts/MainLayout.jsx';
 import AuthLayout from './layouts/AuthLayout.jsx';
@@ -15,19 +15,24 @@ import SignUpLayout from './layouts/SignUpLayout.jsx';
 import Placeholder from './pages/Placeholder.jsx';
 
 import MutualPick from './pages/Matching/MutualPick.jsx';
+import NewsList from './pages/News/NewsList.jsx';
+import NewsDetail from './pages/News/NewsDetail.jsx';
 
 export default function App() {
-  const naviate = useNavigate();
   return (
     <>
       <main>
         <Routes>
           <Route element={<MainLayout />}>
             <Route path='/' element={<Home />} />
-            <Route path='/news' element={<Placeholder title="소식" />} />
-            <Route path='/laundry' element={<Placeholder title="세탁" />} />
-            <Route path='/group-buy' element={<Placeholder title="공구" />} />
-            <Route path='/mypage' element={<Placeholder title="마이페이지" />} />
+            <Route path='/news' element={<NewsList />} />
+            <Route path='/news/:id' element={<NewsDetail />} />
+            <Route path='/laundry' element={<Placeholder title='세탁' />} />
+            <Route path='/group-buy' element={<Placeholder title='공구' />} />
+            <Route
+              path='/mypage'
+              element={<Placeholder title='마이페이지' />}
+            />
             <Route path='/matching/mutual' element={<MutualPick />} />
           </Route>
 
