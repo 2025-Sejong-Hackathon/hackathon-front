@@ -1,29 +1,96 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import MyLaundryStatus from './components/MyLaundryStatus';
 import DailyLaundryInfo from './components/DailyLaundryInfo';
 import LaundryMachineList from './components/LaundryMachineList';
 
-const MOCK_MY_MACHINE = {
-  id: 4,
-  type: 'washer',
-  timeLeft: 50,
-  status: 'in-use'
-};
-
 export default function Laundry() {
-  // 사용 중인 세탁기 유무 상태 (데모를 위해 true로 설정 가능)
-  const [myMachine] = useState(MOCK_MY_MACHINE); 
+  const [mySession, setMySession] = useState(null);
+  const [user, setUser] = useState(null);
   const [isQrOpen, setIsQrOpen] = useState(false);
 
-  const handleScan = (result) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+
+        // 1. User Info (for Gender Zone)
+        const userRes = await fetch(`${API_URL}/api/v1/members/me`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          setUser(userData.data);
+        }
+
+        // 2. My Sessions
+        const sessionRes = await fetch(`${API_URL}/api/v1/laundry/my-sessions`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (sessionRes.ok) {
+          const sessionData = await sessionRes.json();
+          // Assuming we show the first active session
+          if (sessionData.data && sessionData.data.length > 0) {
+            setMySession(sessionData.data[0]);
+          } else {
+            setMySession(null);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleScan = async (result) => {
     if (result && result.length > 0) {
-      // @yudiel/react-qr-scanner는 결과 객체의 배열을 반환할 수 있습니다.
-      const scannedText = result[0].rawValue;
-      alert(`QR 인식 성공: ${scannedText}`);
+      const scannedValue = result[0].rawValue;
       setIsQrOpen(false);
+
+      const machineId = parseInt(scannedValue, 10);
+      if (isNaN(machineId)) {
+        alert('유효하지 않은 QR 코드입니다.');
+        return;
+      }
+
+      // Ask for duration (simplified)
+      const duration = prompt('사용할 시간(분)을 입력해주세요 (1~120)', '45');
+      if (!duration) return;
+
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/api/v1/laundry/start`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            machineId: machineId,
+            durationMinutes: parseInt(duration, 10)
+          }),
+        });
+
+        if (response.ok) {
+          alert('세탁기 사용을 시작합니다!');
+          window.location.reload(); 
+        } else {
+          const err = await response.json();
+          alert(err.message || '시작 실패');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('오류가 발생했습니다.');
+      }
     }
   };
+
+  const genderZone = user?.gender === 'MALE' ? 'MALE' : 'FEMALE';
 
   return (
     <div className="w-full flex flex-col px-6 pt-12 pb-32 bg-gray-50 min-h-screen">
@@ -85,21 +152,26 @@ export default function Laundry() {
       )}
 
       {/* 1. 내가 사용 중인 세탁기 (사용 중일 때만 표시) */}
-      {myMachine && (
+      {mySession && (
         <section className="mb-10">
-          <MyLaundryStatus machine={myMachine} />
+          <MyLaundryStatus session={mySession} />
         </section>
       )}
 
       {/* 2. AI 혼잡도 예측 섹션 */}
-      <section className="mb-10 bg-white rounded-[32px] p-6 shadow-sm border border-rose-50">
-        <DailyLaundryInfo />
-      </section>
+      {/* user가 로드된 후에만 표시 (성별 존 필요) */}
+      {user && (
+        <section className="mb-10 bg-white rounded-[32px] p-6 shadow-sm border border-rose-50">
+          <DailyLaundryInfo genderZone={genderZone} />
+        </section>
+      )}
 
       {/* 3. 실시간 사용 현황 섹션 */}
-      <section>
-        <LaundryMachineList />
-      </section>
+      {user && (
+        <section>
+          <LaundryMachineList genderZone={genderZone} />
+        </section>
+      )}
     </div>
   );
 }
