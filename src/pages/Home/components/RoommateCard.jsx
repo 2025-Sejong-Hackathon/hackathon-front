@@ -6,6 +6,7 @@ export default function RoommateCard({
   grade,
   geekBti,
   quote,
+  matchScore,
   isLast,
   onClick,
 }) {
@@ -14,7 +15,7 @@ export default function RoommateCard({
   return (
     <div
       onClick={onClick}
-      className={`flex-shrink-0 w-[160px] h-[280px] rounded-[20px] relative overflow-hidden bg-white shadow-md cursor-pointer hover:scale-[1.02] transition-transform ${isLast ? 'mr-6' : ''}`}
+      className={`flex-shrink-0 w-[160px] h-[320px] rounded-[20px] relative overflow-hidden bg-white shadow-md cursor-pointer hover:scale-[1.02] transition-transform ${isLast ? 'mr-6' : ''}`}
     >
       {/* Background Gradient */}
       <div className='absolute inset-0 bg-gradient-to-b from-[#F48E98] to-[#DA4C5E] opacity-90' />
@@ -24,7 +25,7 @@ export default function RoommateCard({
 
       <div className='relative z-10 flex flex-col items-center h-full pt-4 px-3 pb-6'>
         {/* GeekBTI Badge */}
-        <div className='bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full border border-white/30 mb-3'>
+        <div className='bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full border border-white/30'>
           <span className='text-white font-bold text-lg tracking-wider'>
             {geekBti}
           </span>
@@ -48,9 +49,17 @@ export default function RoommateCard({
         {/* Info */}
         <div className='flex flex-col items-center text-white mb-2'>
           <h3 className='font-bold text-xl mb-1'>{name}</h3>
-          <p className='text-xs opacity-90 font-medium'>
+          <p className='text-xs opacity-90 font-medium mb-1'>
             {major} / {grade}
           </p>
+          {/* Match Score */}
+          {matchScore !== undefined && (
+            <div className='bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/30 mt-1'>
+              <span className='text-white text-xs font-semibold'>
+                매칭점수 : {matchScore}%
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Quote */}
