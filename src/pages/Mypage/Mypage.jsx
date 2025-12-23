@@ -18,7 +18,7 @@ export default function Mypage() {
       try {
         const API_URL = import.meta.env.VITE_API_URL;
         const accessToken = localStorage.getItem('accessToken');
-        
+
         // 1. My Info
         const userRes = await fetch(`${API_URL}/api/v1/members/me`, {
           method: 'GET',
@@ -30,10 +30,13 @@ export default function Mypage() {
         }
 
         // 2. Roommate Match Info
-        const matchRes = await fetch(`${API_URL}/api/v1/match-requests/roommate-matches`, {
-          method: 'GET',
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const matchRes = await fetch(
+          `${API_URL}/api/v1/match-requests/roommate-matches`,
+          {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${accessToken}` },
+          },
+        );
         if (matchRes.ok) {
           const matchData = await matchRes.json();
           console.log('Roommate Match:', matchData);
@@ -42,11 +45,11 @@ export default function Mypage() {
             // matchData.data[0]이 현재 매칭이라고 가정
             const currentMatch = matchData.data[0];
             // 내가 member1이면 member2가 룸메이트, 반대면 member1이 룸메이트
-            // API 응답 구조 상 내 ID를 알아야 정확히 구분 가능하지만, 
+            // API 응답 구조 상 내 ID를 알아야 정확히 구분 가능하지만,
             // 여기서는 간단히 상대방 이름을 보여주는 로직이 필요함.
-            // 일단 임시로 member2 정보를 룸메이트로 간주하거나, 
+            // 일단 임시로 member2 정보를 룸메이트로 간주하거나,
             // user 정보가 로드된 후 ID 비교를 해야 함.
-            
+
             // 편의상 member2Name이 내 이름과 다르면 member2, 같으면 member1Name을 룸메이트로 설정
             // (user state가 비동기라 바로 비교 어려울 수 있음)
             setRoommate(currentMatch);
@@ -140,10 +143,14 @@ export default function Mypage() {
               <div>
                 <p className='text-lg font-bold text-gray-900'>
                   {/* 내 ID와 비교하여 상대방 이름 표시 로직 (간단히 처리) */}
-                  {user.id === roommate.member1Id ? roommate.member2Name : roommate.member1Name}
+                  {user.id === roommate.member1Id
+                    ? roommate.member2Name
+                    : roommate.member1Name}
                 </p>
                 <p className='text-sm text-gray-500'>
-                  {user.id === roommate.member1Id ? roommate.member2StudentId : roommate.member1StudentId}
+                  {user.id === roommate.member1Id
+                    ? roommate.member2StudentId
+                    : roommate.member1StudentId}
                 </p>
               </div>
               <div className='px-3 py-1 bg-white rounded-full text-xs font-bold text-rose-500 border border-rose-200'>
@@ -155,27 +162,31 @@ export default function Mypage() {
       )}
 
       {/* Points Card */}
-      <div className='px-6 mb-6'>
-        <div className='bg-white rounded-3xl p-6 shadow-sm border border-rose-50'>
-          <h3 className='text-base font-bold text-gray-900 mb-4'>상/벌점</h3>
-          <div className='flex items-center gap-6'>
-            <div className='flex items-center gap-2'>
-              <div className='w-12 h-12 bg-green-100 rounded-full flex items-center justify-center'>
-                <span className='text-xl text-green-600 font-bold'>+</span>
-              </div>
-              <div>
-                <p className='text-sm text-gray-500 mb-0.5'>상점</p>
-                <p className='text-xl font-bold text-green-600'>{3}</p>
-              </div>
+      <div className='px-6 mb-8'>
+        <div className='flex gap-4'>
+          {/* Reward Points */}
+          <div className='flex-1 bg-white rounded-[32px] p-6 shadow-sm border border-emerald-50 flex flex-col items-center justify-center relative overflow-hidden group'>
+            <div className='absolute -right-4 -top-4 w-16 h-16 bg-emerald-500 opacity-5 rounded-full' />
+            <span className='text-xs font-black text-emerald-600 mb-2 tracking-widest'>
+              상점
+            </span>
+            <div className='flex items-baseline gap-0.5'>
+              <span className='text-4xl font-black text-emerald-500 leading-none'>
+                3
+              </span>
             </div>
-            <div className='flex items-center gap-2'>
-              <div className='w-12 h-12 bg-red-100 rounded-full flex items-center justify-center'>
-                <span className='text-xl text-red-600 font-bold'>-</span>
-              </div>
-              <div>
-                <p className='text-sm text-gray-500 mb-0.5'>벌점</p>
-                <p className='text-xl font-bold text-red-600'>{1}</p>
-              </div>
+          </div>
+
+          {/* Penalty Points */}
+          <div className='flex-1 bg-white rounded-[32px] p-6 shadow-sm border border-rose-50 flex flex-col items-center justify-center relative overflow-hidden'>
+            <div className='absolute -right-4 -top-4 w-16 h-16 bg-rose-500 opacity-5 rounded-full' />
+            <span className='text-xs font-black text-rose-600 mb-2 tracking-widest'>
+              벌점
+            </span>
+            <div className='flex items-baseline gap-0.5'>
+              <span className='text-4xl font-black text-rose-500 leading-none'>
+                1
+              </span>
             </div>
           </div>
         </div>
