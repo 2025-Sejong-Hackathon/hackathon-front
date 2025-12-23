@@ -41,25 +41,28 @@ export default function Recommendation() {
     }
 
     if (wantsRecommendation) {
-        if (!introduction.trim()) {
-            alert('한 줄 소개를 입력해주세요.');
-            return;
-        }
-        // Logic to save recommendation settings would go here
-        console.log('Saving recommendation settings:', { recruitPeriod, introduction });
-        // Navigate to finding page (final loading)
-        navigate('/signup/finding?next=/');
+      if (!introduction.trim()) {
+        alert('한 줄 소개를 입력해주세요.');
+        return;
+      }
+      // Logic to save recommendation settings would go here
+      console.log('Saving recommendation settings:', {
+        recruitPeriod,
+        introduction,
+      });
+      // Navigate to finding page (final loading)
+      navigate('/signup/finding?next=/');
     } else {
-        console.log('User opted out of recommendation.');
-        alert('회원가입이 완료되었습니다!');
-        navigate('/'); // Go to Home or Login
+      console.log('User opted out of recommendation.');
+      navigate('/'); // Go to Home or Login
     }
   };
 
   return (
     <div className='w-full flex flex-col flex-grow pb-10 animate-fade-in'>
       <h1 className='text-white text-xl font-bold mb-8 leading-relaxed'>
-        긱Seek가 제공하는 ‘룸메이트 추천’ 기능을<br />
+        긱Seek가 제공하는 ‘룸메이트 추천’ 기능을
+        <br />
         받아 보시겠어요?
       </h1>
 
@@ -99,15 +102,27 @@ export default function Recommendation() {
                 onChange={(e) => setRecruitPeriod(e.target.value)}
                 className='w-full p-4 rounded-2xl bg-white text-gray-700 font-medium appearance-none focus:outline-none focus:ring-2 focus:ring-rose-300'
               >
-                <option value="25학년도 1학기">25학년도 1학기</option>
-                <option value="25학년도 여름학기">25학년도 여름학기</option>
-                <option value="25학년도 2학기">25학년도 2학기</option>
-                <option value="25학년도 겨울학기">25학년도 겨울학기</option>
+                <option value='25학년도 1학기'>25학년도 1학기</option>
+                <option value='25학년도 여름학기'>25학년도 여름학기</option>
+                <option value='25학년도 2학기'>25학년도 2학기</option>
+                <option value='25학년도 겨울학기'>25학년도 겨울학기</option>
               </select>
               {/* Custom Arrow Icon */}
               <div className='absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none'>
-                <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1L7 7L13 1" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                  width='14'
+                  height='8'
+                  viewBox='0 0 14 8'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    d='M1 1L7 7L13 1'
+                    stroke='#9CA3AF'
+                    strokeWidth='2'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                  />
                 </svg>
               </div>
             </div>
@@ -119,10 +134,10 @@ export default function Recommendation() {
               {userName}님의 한 줄 소개를 작성해 주세요
             </label>
             <input
-              type="text"
+              type='text'
               value={introduction}
               onChange={(e) => setIntroduction(e.target.value)}
-              placeholder="ex. 저 완전 깔끔쟁이에요! 같이 살아요!"
+              placeholder='ex. 저 완전 깔끔쟁이에요! 같이 살아요!'
               className='w-full p-4 rounded-2xl bg-white text-gray-700 font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-300'
             />
           </div>
