@@ -117,7 +117,7 @@ export default function GroupBuyList() {
       </div>
 
       {/* Group Buy List */}
-      <div className='flex flex-col px-6 pb-8 gap-3'>
+      <div className='flex flex-col px-6 pb-32 gap-3'>
         {filteredGroupBuys.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-16'>
             <p className='text-gray-400 text-lg mb-2'>등록된 공구가 없습니다</p>
