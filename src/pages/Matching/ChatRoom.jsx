@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import ChatMessage from './components/ChatMessage';
 import DetailProfileModal from './components/DetailProfileModal';
 
@@ -7,7 +7,7 @@ const MOCK_PROFILE = {
   name: '이채원',
   major: '컴퓨터공학과',
   grade: '4학년',
-  mbti: 'ISTJ', // Example
+  mbti: 'ISTJ', 
   quote: '안녕하세요 저 깔끔쟁이!',
   lifestyle: [
     { label: '흡연', value: '안함' },
@@ -20,7 +20,8 @@ const MOCK_PROFILE = {
 export default function ChatRoom() {
   const navigate = useNavigate();
   const location = useLocation();
-  const roommateName = location.state?.name || '이채원';
+  const { id: matchPairId } = useParams(); // URL 파라미터에서 matchPairId 가져오기
+  const roommateName = location.state?.name || '익명';
 
   const [messages, setMessages] = useState([
     { id: 1, text: '안녕하세요!!', time: '4:32 PM', isMe: false },
@@ -33,7 +34,8 @@ export default function ChatRoom() {
     },
   ]);
   const [inputText, setInputText] = useState('');
-  const [isConfirmRequested, setIsConfirmRequested] = useState(false);
+  const [isConfirmRequested, setIsConfirmRequested] = useState(false); // 내가 보낸 요청 여부
+  const [receivedRequestId, setReceivedRequestId] = useState(null); // 받은 요청 ID
   const [isModalOpen, setIsModalOpen] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -43,14 +45,58 @@ export default function ChatRoom() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isConfirmRequested]);
+  }, [messages, isConfirmRequested, receivedRequestId]);
+
+  // 받은 요청 확인 API
+  useEffect(() => {
+    const fetchReceivedRequests = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/api/v1/match-requests/received`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // 현재 채팅방(matchPairId)에 해당하는 요청 찾기
+          // matchPairId는 string일 수 있으므로 비교 시 주의
+          const request = data.data.find(req => String(req.matchPairId) === String(matchPairId));
+          
+          if (request) {
+            setReceivedRequestId(request.id);
+            // 메시지 리스트에 요청 카드 추가 (중복 방지 로직 필요하지만 간단하게)
+            setMessages(prev => {
+              if (prev.some(m => m.type === 'request')) return prev;
+              return [
+                ...prev,
+                {
+                  id: 'req-' + request.id,
+                  type: 'request',
+                  time: new Date(request.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  isMe: false,
+                }
+              ];
+            });
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    
+    if (matchPairId) {
+        fetchReceivedRequests();
+    }
+  }, [matchPairId]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!inputText.trim()) return;
 
     const newMessage = {
-      id: messages.length + 1,
+      id: Date.now(),
       text: inputText,
       time: new Date().toLocaleTimeString([], {
         hour: '2-digit',
@@ -63,19 +109,81 @@ export default function ChatRoom() {
     setInputText('');
   };
 
-  const handleConfirmRequest = () => {
-    const requestMessage = {
-      id: messages.length + 1,
-      type: 'request',
-      time: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      isMe: false,
-    };
+  const handleConfirmRequest = async () => {
+    if (!matchPairId) return;
 
-    setIsConfirmRequested(true);
-    setMessages((prev) => [...prev, requestMessage]);
+    try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/api/v1/match-requests/match-pairs/${matchPairId}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (response.ok) {
+            alert('룸메이트 확정 요청을 보냈습니다.');
+            setIsConfirmRequested(true);
+            setMessages((prev) => [
+                ...prev, 
+                {
+                    id: Date.now(),
+                    type: 'system',
+                    text: '룸메이트 확정 요청을 보냈습니다.',
+                    isMe: true
+                }
+            ]);
+        } else {
+            const err = await response.json();
+            alert(err.message || '요청 실패');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('오류가 발생했습니다.');
+    }
+  };
+
+  const handleAcceptRequest = async () => {
+    if (!receivedRequestId) return;
+
+    try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/api/v1/match-requests/${receivedRequestId}/accept`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (response.ok) {
+            alert('룸메이트 매칭이 완료되었습니다! 축하합니다 🎉');
+            navigate('/'); // 홈으로 이동하거나 완료 페이지로 이동
+        } else {
+            alert('수락 처리에 실패했습니다.');
+        }
+    } catch (e) {
+        console.error(e);
+    }
+  };
+
+  const handleRejectRequest = async () => {
+      if (!receivedRequestId) return;
+
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/api/v1/match-requests/${receivedRequestId}/reject`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (response.ok) {
+            alert('요청을 거절했습니다.');
+            setReceivedRequestId(null);
+            // 메시지 리스트에서 요청 제거하거나 시스템 메시지로 변경
+            setMessages(prev => prev.filter(m => m.type !== 'request'));
+        }
+    } catch (e) {
+        console.error(e);
+    }
   };
 
   const handleProfileClick = () => {
@@ -114,13 +222,15 @@ export default function ChatRoom() {
             key={msg.id} 
             {...msg} 
             onProfileClick={handleProfileClick}
+            onAccept={handleAcceptRequest}
+            onReject={handleRejectRequest}
           />
         ))}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Floating Action Button (Before Request) */}
-      {!isConfirmRequested && (
+      {!isConfirmRequested && !receivedRequestId && (
         <div className='fixed bottom-[185px] left-0 right-0 w-full flex justify-center z-20 pointer-events-none'>
           <button
             onClick={handleConfirmRequest}

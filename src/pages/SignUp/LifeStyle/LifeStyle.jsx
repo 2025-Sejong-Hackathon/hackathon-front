@@ -60,10 +60,12 @@ export default function LifeStyle() {
 
       // API 스펙에 맞게 데이터 매핑
       const onboardingData = {
-        gender: gender || 'FEMALE', // 기본값 설정 (방어적 코드)
+        gender: gender || 'FEMALE',
         birthDate: birthDate || '2000-01-01',
         isSmoker: !!answers[0],
+        roommateSmokingPref: !!answers[1], // 룸메이트 흡연 선호 여부
         isDrinker: !!answers[2],
+        roommateDrinkingPref: !!answers[3], // 룸메이트 음주 선호 여부
         isColdSensitive: !!answers[4],
         isHeatSensitive: !!answers[5]
       };

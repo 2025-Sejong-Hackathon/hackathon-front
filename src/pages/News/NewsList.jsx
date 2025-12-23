@@ -50,7 +50,7 @@ export default function NewsList() {
       </div>
 
       {/* News List */}
-      <div className='flex flex-col px-6 pb-8 gap-4'>
+      <div className='flex flex-col px-6 pb-32 gap-4'>
         {MOCK_NEWS.map((news) => (
           <div
             key={news.id}

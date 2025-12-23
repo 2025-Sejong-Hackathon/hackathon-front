@@ -1,75 +1,99 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HorizontalRoommateCard from './components/HorizontalRoommateCard';
 
-const MUTUAL_MATCHES = [
-  {
-    id: 1,
-    name: '김다람',
-    major: '탐정학과',
-    grade: '3학년',
-    mbti: 'ENFP',
-    quote: '궁금한 건 못 참아! 탐정 다람이의 모험 시작! 같이 야식 먹어요'
-  },
-  {
-    id: 2,
-    name: '박시크',
-    major: '도시공학과',
-    grade: '4학년',
-    mbti: 'INTJ',
-    quote: '조용하고 깔끔한 분위기를 선호합니다. 배려하며 지내요.'
-  },
-  {
-    id: 3,
-    name: '최열정',
-    major: '체육학과',
-    grade: '2학년',
-    mbti: 'ESFJ',
-    quote: '아침 운동 같이 하실 분? 활기찬 긱사 생활 기대해요!'
-  },
-  {
-    id: 4,
-    name: '이감성',
-    major: '문예창작과',
-    grade: '1학년',
-    mbti: 'INFP',
-    quote: '밤에는 주로 글을 씁니다. 서로의 취향을 존중해요.'
-  }
-];
-
 export default function MutualPick() {
   const navigate = useNavigate();
+  const [matches, setMatches] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch(`${API_URL}/api/v1/picks/match-pairs`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Mutual matches:', data);
+          // API 응답 구조에 맞게 매핑 (member1 또는 member2 중 내가 아닌 사람을 찾아야 할 수도 있음)
+          // 여기서는 일단 받은 데이터를 기반으로 매핑
+          const mapped = data.data.map((item) => ({
+            id: item.id,
+            matchPairId: item.id,
+            name: item.member2Name, // 예시: 상대방 이름
+            major: '학과 정보 없음',
+            grade: '학년 정보 없음',
+            mbti: 'MCSE',
+            quote: '서로 PICK이 완료되었습니다!',
+          }));
+          setMatches(mapped);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchMatches();
+  }, []);
 
   return (
-    <div className="w-full flex flex-col h-full bg-[#F2F4F6]">
+    <div className='w-full flex flex-col h-full bg-[#F2F4F6]'>
       {/* Header */}
-      <header className="flex items-center px-6 pt-12 pb-6 bg-white sticky top-0 z-10 rounded-b-[30px] shadow-sm">
-        <button 
+      <header className='flex items-center px-6 pt-12 pb-6 bg-white sticky top-0 z-10 rounded-b-[30px] shadow-sm'>
+        <button
           onClick={() => navigate(-1)}
-          className="mr-4 p-1 -ml-1 rounded-full hover:bg-gray-100 transition-colors"
+          className='mr-4 p-1 -ml-1 rounded-full hover:bg-gray-100 transition-colors'
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
+          <svg
+            width='24'
+            height='24'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='#333'
+            strokeWidth='2.5'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          >
+            <polyline points='15 18 9 12 15 6' />
           </svg>
         </button>
-        <h1 className="text-xl font-bold text-gray-900">서로 PICK한 룸메이트</h1>
+        <h1 className='text-xl font-bold text-gray-900'>
+          서로 PICK한 룸메이트
+        </h1>
       </header>
 
       {/* Content List */}
-      <div className="flex-1 px-6 py-6 overflow-y-auto pb-32">
-        <div className="flex flex-col gap-4">
-          <div className="mb-2">
-            <p className="text-sm text-gray-500">
-              축하해요! <span className="text-rose-500 font-bold">{MUTUAL_MATCHES.length}명</span>의 친구와 마음이 통했어요 🎉
-            </p>
-          </div>
-          
-          {MUTUAL_MATCHES.map((match) => (
-            <HorizontalRoommateCard 
-              key={match.id} 
-              {...match} 
-              onClick={() => navigate(`/matching/chat/${match.id}`, { state: { name: match.name } })}
-            />
-          ))}
+      <div className='flex-1 px-6 py-6 overflow-y-auto pb-32'>
+        <div className='flex flex-col gap-4'>
+          {isLoading ? (
+            <div className='text-center py-10 text-gray-400'>
+              불러오는 중...
+            </div>
+          ) : matches.length === 0 ? (
+            <div className='text-center py-10 text-gray-400'>
+              아직 서로 PICK한 친구가 없어요.
+            </div>
+          ) : (
+            matches.map((match) => (
+              <HorizontalRoommateCard
+                key={match.id}
+                {...match}
+                onClick={() =>
+                  navigate(`/matching/chat/${match.matchPairId}`, {
+                    state: { name: match.name },
+                  })
+                }
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

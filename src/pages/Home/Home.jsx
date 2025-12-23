@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RoommateCard from './components/RoommateCard';
 import DetailProfileModal from '../Matching/components/DetailProfileModal';
@@ -6,41 +6,61 @@ import TogetherIcon from '../../assets/together.svg';
 import LikeIcon from '../../assets/like.svg';
 import MotorcycleIcon from '../../assets/오토바이.png';
 
-const MOCK_ROOMMATES = [
-  {
-    id: 1,
-    name: '김다람',
-    major: '탐정학과',
-    grade: '3학년',
-    geekBti: 'NCTI',
-    quote: '궁금한 건 못 참아! 탐정 다람이의 모험 시작!',
-    matchScore: 85,
-  },
-  {
-    id: 2,
-    name: '이서준',
-    major: '컴퓨터공학',
-    grade: '2학년',
-    geekBti: 'MCTE',
-    quote: '효율적인 코딩과 깔끔한 정리가 내 특기!',
-    matchScore: 92,
-  },
-  {
-    id: 3,
-    name: '박지민',
-    major: '시각디자인',
-    grade: '4학년',
-    geekBti: 'MCSE',
-    quote: '예술적인 감각으로 방을 꾸며볼까요?',
-    matchScore: 78,
-  },
-];
-
 export default function Home() {
   const [isRecommendOn, setIsRecommendOn] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoommate, setSelectedRoommate] = useState(null);
+  const [roommates, setRoommates] = useState([]);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        const accessToken = localStorage.getItem('accessToken');
+        
+        // 1. Fetch User Info
+        const userRes = await fetch(`${API_URL}/api/v1/members/me`, {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          setUser(userData.data);
+        }
+
+        // 2. Fetch Recommendations
+        if (isRecommendOn) {
+            const recRes = await fetch(`${API_URL}/api/v1/match/recommendations`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            
+            if (recRes.ok) {
+            const recData = await recRes.json();
+            console.log('Recommendations:', recData);
+            
+            // Map API data to component props
+            const mappedRoommates = recData.data.map((item, index) => ({
+                id: item.student_id, // Use student_id as key
+                name: item.name || `학우 ${index + 1}`, // API might not return name yet
+                major: item.major,
+                grade: item.grade || '학년 정보 없음',
+                geekBti: item.gikbti || 'MCSE', // Fallback or map from items
+                quote: '잘 맞는 룸메이트가 되어드릴게요!', // Placeholder
+                matchScore: item.match_rate,
+                ...item // Spread original data for modal
+            }));
+            setRoommates(mappedRoommates);
+            }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchData();
+  }, [isRecommendOn]);
 
   // 최근 공구 목록 (실제로는 API에서 가져와야 함)
   const RECENT_GROUP_BUYS = [
@@ -69,18 +89,43 @@ export default function Home() {
     setIsModalOpen(true);
   };
 
-  const handlePick = () => {
-    // TODO: 실제로는 API 호출
-    alert(`${selectedRoommate?.name}님에게 PICK 요청을 보냈습니다!`);
-    setIsModalOpen(false);
+  const handlePick = async () => {
+    if (!selectedRoommate) return;
+    
+    try {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const accessToken = localStorage.getItem('accessToken');
+      
+      const response = await fetch(`${API_URL}/api/v1/picks/${selectedRoommate.id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      
+      const result = await response.json();
+      console.log('Pick result:', result);
+      
+      if (response.ok) {
+        alert(`${selectedRoommate.name}님을 PICK 했습니다!`);
+        setIsModalOpen(false);
+      } else {
+        alert(result.message || 'PICK 요청에 실패했습니다.');
+      }
+    } catch (err) {
+      console.error('Pick error:', err);
+      alert('오류가 발생했습니다.');
+    }
   };
 
   const handleGroupBuyClick = (id) => {
     navigate(`/group-buy/${id}`);
   };
+  
+  const userName = user?.name || '승희';
 
   return (
-    <div className='w-full flex flex-col px-6 pt-12'>
+    <div className='w-full flex flex-col px-6 pt-12 pb-32'>
       {/* Header */}
       <header className='flex justify-between items-center mb-8'>
         <h1 className='text-2xl font-bold text-gray-900'>긱Seek</h1>
@@ -105,7 +150,7 @@ export default function Home() {
       {!isRecommendOn && (
         <div className='flex items-center justify-between mb-6'>
           <h2 className='text-xl font-bold text-gray-900'>
-            승희님, 안녕하세요 👋
+            {userName}님, 안녕하세요 👋
           </h2>
           <img
             src={MotorcycleIcon}
@@ -240,7 +285,7 @@ export default function Home() {
         <div className='flex flex-col'>
           <div className='mb-6'>
             <h2 className='text-lg font-bold text-gray-800 leading-tight'>
-              승희님의 성향을 기반으로 도출된
+              {userName}님의 성향을 기반으로 도출된
               <br />
               <span className='text-rose-500 border-b-2 border-rose-200'>
                 룸메이트 추천 리스트
@@ -251,11 +296,11 @@ export default function Home() {
 
           {/* Scrollable List */}
           <div className='flex overflow-x-auto pb-8 -mx-6 px-6 scrollbar-hide gap-4'>
-            {MOCK_ROOMMATES.map((roommate, index) => (
+            {roommates.map((roommate, index) => (
               <RoommateCard
                 key={roommate.id}
                 {...roommate}
-                isLast={index === MOCK_ROOMMATES.length - 1}
+                isLast={index === roommates.length - 1}
                 onClick={() => handleCardClick(roommate)}
               />
             ))}

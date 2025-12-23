@@ -1,6 +1,8 @@
-import Character1 from '../../../assets/character1.svg';
+import { getCharacterByGeekBti } from '../../../utils/geekBtiCharacter';
 
 export default function HorizontalRoommateCard({ name, major, grade, mbti, quote, onClick }) {
+  const characterImage = getCharacterByGeekBti(mbti);
+
   return (
     <div 
       onClick={onClick}
@@ -9,11 +11,15 @@ export default function HorizontalRoommateCard({ name, major, grade, mbti, quote
       {/* Profile Image Area */}
       <div className="relative">
         <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
-          <img 
-            src={Character1} 
-            alt={name} 
-            className="w-12 h-12 object-contain"
-          />
+          {characterImage ? (
+            <img 
+              src={characterImage} 
+              alt={name} 
+              className="w-12 h-12 object-contain"
+            />
+          ) : (
+            <span className="text-rose-300 font-bold text-lg">?</span>
+          )}
         </div>
         {/* Match Icon Badge (Optional) */}
         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center border-2 border-white text-xs">

@@ -1,4 +1,4 @@
-export default function ChatMessage({ text, time, isMe, type, onProfileClick }) {
+export default function ChatMessage({ text, time, isMe, type, onProfileClick, onAccept, onReject }) {
   if (type === 'system') {
     return (
       <div className="flex justify-center my-4">
@@ -14,9 +14,20 @@ export default function ChatMessage({ text, time, isMe, type, onProfileClick }) 
       <div className="flex flex-col items-start max-w-[70%] mb-4">
         <div className="bg-[#FFF0F0] p-4 rounded-[20px] rounded-tl-none border border-rose-100 shadow-sm w-full">
           <p className="text-gray-600 text-sm mb-3">상대가 룸메이트 확정을 요청했어요.</p>
-          <button className="w-full bg-[#E87280] text-white font-bold py-2 rounded-xl text-sm shadow-sm active:scale-[0.98] transition-transform">
-            수락하기
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={onReject}
+              className="flex-1 bg-white text-gray-500 font-bold py-2 rounded-xl text-sm shadow-sm border border-gray-100 active:scale-[0.98] transition-transform hover:bg-gray-50"
+            >
+              거절
+            </button>
+            <button 
+              onClick={onAccept}
+              className="flex-1 bg-[#E87280] text-white font-bold py-2 rounded-xl text-sm shadow-sm active:scale-[0.98] transition-transform hover:bg-[#d66572]"
+            >
+              수락
+            </button>
+          </div>
         </div>
         <span className="text-[10px] text-gray-400 mt-1 ml-1">{time}</span>
       </div>

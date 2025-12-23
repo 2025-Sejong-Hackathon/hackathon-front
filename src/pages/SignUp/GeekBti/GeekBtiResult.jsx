@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getCharacterByGeekBti } from '../../../utils/geekBtiCharacter';
 
 const TRAITS = [
   {
@@ -91,6 +92,16 @@ export default function GeekBtiResult() {
 
       {/* Result Card */}
       <div className='bg-white rounded-[30px] w-full p-8 mb-8 flex flex-col justify-center items-center shadow-md'>
+        {/* Character Image */}
+        <div className='w-32 h-32 mb-4'>
+          {getCharacterByGeekBti(resultType) && (
+            <img 
+              src={getCharacterByGeekBti(resultType)} 
+              alt={resultType} 
+              className='w-full h-full object-contain'
+            />
+          )}
+        </div>
         <span className='text-rose-500 text-5xl font-black tracking-widest mb-1'>
           {resultType}
         </span>
