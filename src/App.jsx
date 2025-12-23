@@ -26,6 +26,7 @@ import RoommateEvaluation from './pages/Mypage/RoommateEvaluation.jsx';
 import ReceivePick from './pages/Matching/ReceivePick.jsx';
 
 import ChatRoom from './pages/Matching/ChatRoom.jsx';
+import Laundry from './pages/Laundry/Laundry.jsx';
 
 export default function App() {
   return (
@@ -36,7 +37,7 @@ export default function App() {
             <Route path='/' element={<Home />} />
             <Route path='/news' element={<NewsList />} />
             <Route path='/news/:id' element={<NewsDetail />} />
-            <Route path='/laundry' element={<Placeholder title='세탁' />} />
+            <Route path='/laundry' element={<Laundry />} />
             <Route path='/group-buy' element={<GroupBuyList />} />
             <Route path='/group-buy/create' element={<GroupBuyCreate />} />
             <Route path='/group-buy/chats' element={<GroupBuyChatList />} />
