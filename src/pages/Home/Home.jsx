@@ -9,7 +9,7 @@ const MOCK_ROOMMATES = [
     name: '김다람',
     major: '탐정학과',
     grade: '3학년',
-    mbti: 'ENFP',
+    geekBti: 'NCTI',
     quote: '궁금한 건 못 참아! 탐정 다람이의 모험 시작!'
   },
   {
@@ -17,7 +17,7 @@ const MOCK_ROOMMATES = [
     name: '이서준',
     major: '컴퓨터공학',
     grade: '2학년',
-    mbti: 'ISTJ',
+    geekBti: 'MCTE',
     quote: '효율적인 코딩과 깔끔한 정리가 내 특기!'
   },
   {
@@ -25,7 +25,7 @@ const MOCK_ROOMMATES = [
     name: '박지민',
     major: '시각디자인',
     grade: '4학년',
-    mbti: 'ISFP',
+    geekBti: 'MCSE',
     quote: '예술적인 감각으로 방을 꾸며볼까요?'
   }
 ];
