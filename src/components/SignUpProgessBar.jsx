@@ -9,13 +9,14 @@ const STEPS = [
 
 export default function SignUpProgressBar({ currentStep = 2 }) {
   return (
-    <div className='w-full bg-rose-500 pt-10 pb-4'>
-      <div className='relative flex justify-between w-full max-w-sm mx-auto'>
-        <div
-          className='absolute top-4 left-0 w-full h-0.5 bg-rose-300'
-          aria-hidden='true'
-        />
+    <div className='w-full bg-rose-500 pt-10 pb-4 relative overflow-hidden'>
+      {/* Full width line */}
+      <div
+        className='absolute top-[60px] left-0 w-full h-0.5 bg-rose-300'
+        aria-hidden='true'
+      />
 
+      <div className='relative flex justify-between w-full max-w-sm mx-auto px-4'>
         {STEPS.map((step, index) => {
           const stepNum = index + 1;
           const isCompleted = stepNum < currentStep;
@@ -28,7 +29,7 @@ export default function SignUpProgressBar({ currentStep = 2 }) {
             >
               {/* Circle */}
               <div
-                className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${
+                className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 ${
                   isCurrent
                     ? 'bg-white scale-110 shadow-md'
                     : isCompleted
@@ -37,11 +38,11 @@ export default function SignUpProgressBar({ currentStep = 2 }) {
                 }`}
               >
                 {isCompleted ? (
-                  <div className='w-8 h-8 rounded-full bg-rose-300 flex items-center justify-center'>
+                  <div className='w-10 h-10 rounded-full bg-rose-300 flex items-center justify-center'>
                     <img
                       src={SignUpCheckIcon}
                       alt='Checked'
-                      className='w-5 h-5'
+                      className='w-6 h-6'
                     />
                   </div>
                 ) : isCurrent ? (
